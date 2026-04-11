@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
@@ -28,12 +27,10 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body className="flex flex-col bg-accent">
-        <ReactQueryProvider>
-          <Navbar/>
-            <Toaster />
-            {children}
-          <Footer/>
-        </ReactQueryProvider>
+        <Navbar/>
+          <Toaster />
+          {children}
+        <Footer/>
       </body>
     </html>
   );
