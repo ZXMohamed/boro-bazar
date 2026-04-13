@@ -149,12 +149,12 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 }
 
-body{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer components {
+  .sec-layout {
+    @apply container mx-auto px-3 md:px-5;
+  }
 }

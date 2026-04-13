@@ -29,3 +29,12 @@ export interface ProductsResponseT {
   limit: number;
   pages: number;
 }
+
+export interface CategoryT {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
+}

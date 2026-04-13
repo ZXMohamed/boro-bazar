@@ -25,11 +25,11 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} antialiased`}
     >
-      <body className="bg-accent flex flex-col font-sans">
+      <body>
         <Navbar />
-        <Toaster />
-        {children}
+        <main>{children}</main>
         <Footer />
+        <Toaster />
       </body>
     </html>
   );
