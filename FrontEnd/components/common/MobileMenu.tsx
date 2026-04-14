@@ -46,7 +46,7 @@ const MobileMenu = ({ categories, token }: MobileMenuProps) => {
             <Link href="/">
               <span className="sr-only">Home</span>
               <Image
-                src="/images/logo.svg"
+                src="/logo.svg"
                 alt="BoroBazar Logo"
                 className="max-w-36 md:max-w-40"
                 loading="eager"
