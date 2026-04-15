@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Rate from "./rate";
 
-interface ProductInterface {
+type productDataType = {
   id: string;
   image: string;
   title: string;
@@ -13,11 +13,15 @@ interface ProductInterface {
   rate?: number | null;
   price: number;
   oldPrice?: number | null;
-  currency: string;
   inCart: boolean;
 }
 
-const ProductCard = ({ id="", image = "", title = "", slug = null, rate = null, price = 0, oldPrice = null, currency = "", inCart = false }: ProductInterface) => {
+interface ProductInterface {
+  data: productDataType,
+  currency: string;
+}
+
+const ProductCard = ({ data: { id = "", image = "", title = "", slug = null, rate = null, price = 0, oldPrice = null, inCart = false }, currency = "" }: ProductInterface) => {
 
   if (id.length === 0) return <></>;
   
@@ -54,4 +58,4 @@ const ProductCard = ({ id="", image = "", title = "", slug = null, rate = null, 
 export default ProductCard;
 
 //*example 
-//<ProductCard currency="$" id="1" image="/product1.png" inCart={false} oldPrice={50.0} price={40.0} rate={3} slug="product-1" title="100 Percent Apple Juice – 64 fl oz Bottle" />
+//<ProductCard currency="$" data={{ id: "1", image: "/product1.png", inCart: false, oldPrice: 50.0, price: 40.0, rate: 3, slug: "product-1", title: "100 Percent Apple Juice – 64 fl oz Bottle" }} />
