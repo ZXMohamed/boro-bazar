@@ -1,4 +1,4 @@
-import { categories } from "@/components/layout/Navbar";
+import { categories } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,

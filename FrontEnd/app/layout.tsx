@@ -1,9 +1,10 @@
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/footer";
+import Navbar from "@/components/layout/navbar";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import "@radix-ui/themes/styles.css";
 
 const inter = Inter({
   variable: "--font-inter",
