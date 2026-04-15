@@ -1,9 +1,10 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { FaShoppingCart } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
-import Rate from "./rate";
+import Rate from "./Rate";
 
 type productDataType = {
   id: string;
