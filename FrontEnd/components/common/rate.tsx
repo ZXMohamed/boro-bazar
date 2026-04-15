@@ -1,5 +1,5 @@
 "use client"
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Flex } from "@radix-ui/themes";
 import { FaStar } from "react-icons/fa";
 import { cn } from "@/lib/utils";
