@@ -6,6 +6,7 @@ import {
   TopCategories,
 } from "@/components/home";
 
+
 const HomePage = () => {
   return (
     <>
