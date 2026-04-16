@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ProductT } from "@/types/product";
 import Image from "next/image";
@@ -46,3 +47,4 @@ const ProductCard = ({ product }: { product: ProductT }) => {
 };
 
 export default ProductCard;
+
