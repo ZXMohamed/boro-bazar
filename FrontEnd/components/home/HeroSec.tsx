@@ -54,7 +54,7 @@ const HeroSec = () => {
             src="/heroImg.png"
             alt="Wella Organics Super Omega Squares"
             className="relative top-10 -right-10 scale-125 object-contain xl:top-0 xl:-right-28 xl:scale-150"
-            loading="eager"
+            priority
             width={500}
             height={500}
           />
