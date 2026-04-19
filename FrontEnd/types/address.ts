@@ -13,15 +13,15 @@ export interface AddAddressPayloadT {
 
 export interface AddressT {
   id: string;
-  userId: string;
+  userId?: string;
   fullName: string;
   phone: string;
-  email: string;
+  email?: string;
   street: string;
   city: string;
   state: string;
-  postalCode: string;
+  postalCode?: string;
   country: string;
-  isDefault: boolean;
+  isDefault?: boolean;
   type: "home" | "work" | "other";
 }
