@@ -1,4 +1,4 @@
-import Services from "./hello.services.js";
+import Services from "./hello.service.js";
 
 export default class Controller {
     constructor() {
@@ -14,7 +14,5 @@ export default class Controller {
         res.send(await this.services.createHello(name));
         // Here you can add logic to save the name to the database using a model
     }
-
-
 
 }
