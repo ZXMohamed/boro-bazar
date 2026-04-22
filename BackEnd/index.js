@@ -2,10 +2,13 @@ import express from "express";
 import connectDB from "./config/db.js";
 import categoryRoutes from "./Category/category.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { userRouter } from "./User/user.routes.js";
 
+connectDB();
 const app = express();
 
 // Middleware
+
 app.use(express.json());
 
 // Routes
@@ -35,3 +38,10 @@ const startServer = async () => {
 };
 
 startServer();
+
+// User routes
+app.use('/api', userRouter);
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
