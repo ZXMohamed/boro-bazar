@@ -1,13 +1,96 @@
-import { categories } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { CategoryT } from "@/types/product";
 import Link from "next/link";
 import { LuMoveRight } from "react-icons/lu";
 import CategoryCard from "./CategoryCard";
+
+export const categories: CategoryT[] = [
+  {
+    id: "1",
+    name: "Fruits & Vegetables",
+    image: "/image.png",
+    slug: "fruits-vegetables",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "2",
+    name: "Meats & Seafood",
+    image: "/image.png",
+    slug: "meats-seafood",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "3",
+    name: "Breakfast & Dairy",
+    image: "/image.png",
+    slug: "breakfast-dairy",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "4",
+    name: "Breads & Bakery",
+    image: "/image.png",
+    slug: "breads-bakery",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "5",
+    name: "Beverages",
+    image: "/image.png",
+    slug: "beverages",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "6",
+    name: "Frozen Foods",
+    image: "/image.png",
+    slug: "frozen-foods",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "7",
+    name: "Biscuits & Snacks",
+    image: "/image.png",
+    slug: "biscuits-snacks",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "8",
+    name: "Grocery & Staples",
+    image: "/image.png",
+    slug: "grocery-staples",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "9",
+    name: "Baby & Pregnancy",
+    image: "/image.png",
+    slug: "baby-pregnancy",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "10",
+    name: "Healthcare",
+    image: "/image.png",
+    slug: "healthcare",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+];
 
 const TopCategories = () => {
   return (

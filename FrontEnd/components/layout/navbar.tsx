@@ -1,12 +1,14 @@
 import { CategoryT } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { PiSignOutFill } from "react-icons/pi";
-import MobileMenu from "../common/MobileMenu";
 import SearchInput from "../common/SearchInput";
 import { Button } from "../ui/button";
+
+const MobileMenu = React.lazy(() => import("../common/MobileMenu"));
 
 export const categories: CategoryT[] = [
   {
@@ -103,10 +105,10 @@ const Navbar = () => {
             <Image
               src="/logo.svg"
               alt="BoroBazar Logo"
-              className="max-w-36 md:max-w-40"
+              className="h-auto w-36 md:w-40"
               loading="eager"
               width={160}
-              height={100}
+              height={40}
             />
           </Link>
 

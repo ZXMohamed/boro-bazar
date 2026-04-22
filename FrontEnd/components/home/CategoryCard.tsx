@@ -18,6 +18,7 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
           src={category.image}
           alt={category.name}
           fill
+          sizes="(max-width: 640px) 25vw, (max-width: 768px) 20vw, (max-width: 1024px) 16.6vw, 10vw"
           className="object-contain p-[22%]"
           loading="lazy"
         />

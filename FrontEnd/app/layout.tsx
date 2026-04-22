@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import "@radix-ui/themes/styles.css";
+import Providers from "@/providers/provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,10 +28,12 @@ export default function RootLayout({
       className={`${inter.variable} antialiased`}
     >
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-        <Toaster />
+        <Providers>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

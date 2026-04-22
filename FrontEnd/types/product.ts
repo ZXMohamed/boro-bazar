@@ -1,14 +1,18 @@
+import React from "react";
+
 export interface ProductT {
   id: string;
   name: string;
-  description: string;
+  images: string[];
   price: number;
   originalPrice?: number;
-  stock: number;
-  images: string[];
-  category: string;
-  rating: number;
-  reviews: number;
+  slug?: string;
+  description?: string;
+  stock?: number;
+  category?: string;
+  rating?: number;
+  reviews?: number;
+  brand?: string;
 }
 
 export interface ProductsParamsT {
@@ -37,4 +41,10 @@ export interface CategoryT {
   image: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProductListT {
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
 }
