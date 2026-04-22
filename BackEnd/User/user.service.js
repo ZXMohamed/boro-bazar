@@ -1,8 +1,9 @@
 import User from './user.schema.js';
-
+import bcrypt from 'bcryptjs';
 export default class UserService {
     constructor() {
         this.user = User;
+        this.bcrypt = bcrypt;
     }
 
     async getAllUsers() {
@@ -26,6 +27,9 @@ export default class UserService {
 
     async createUser(userData) {
         try {
+            const { password } = userData;
+            const hashedPassword = await this.bcrypt.hash(password, 10);
+            userData.password = hashedPassword;
             const newUser = await this.user.create(userData);
             return newUser;
         } catch (error) {
@@ -37,7 +41,7 @@ export default class UserService {
         try {
             const updatedUser = await this.user.findByIdAndUpdate(
                 id,
-                { ...userData, updatedAt: Date.now() },
+                userData,
                 { new: true }
             ).select('-password');
             if (!updatedUser) throw new Error('User not found');
@@ -51,18 +55,32 @@ export default class UserService {
         try {
             const deletedUser = await this.user.findByIdAndDelete(id);
             if (!deletedUser) throw new Error('User not found');
-            return { message: 'User deleted successfully', user: deletedUser };
+            return { message: 'User deleted successfully' };
         } catch (error) {
             throw new Error(`Error deleting user: ${error.message}`);
         }
     }
 
-    async getUserByEmail(email) {
+    // async getUserByEmail(email) {
+    //     try {
+    //         const user = await this.user.findOne({ email });
+    //         return user;
+    //     } catch (error) {
+    //         throw new Error(`Error fetching user by email: ${error.message}`);
+    //     }
+    // }
+
+    async updatePass(id, { password, oldPassword }) {
         try {
-            const user = await this.user.findOne({ email });
+            const user = await this.user.findById(id);
+            if (!user) throw new Error('User not found');
+            const isMatch = await this.bcrypt.compare(oldPassword, user.password);
+            if (!isMatch) throw new Error('Incorrect password');
+            user.password = await this.bcrypt.hash(password, 10);
+            await user.save();
             return user;
         } catch (error) {
-            throw new Error(`Error fetching user by email: ${error.message}`);
+            throw new Error(`Error updating password: ${error.message}`);
         }
     }
 }
