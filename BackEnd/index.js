@@ -3,6 +3,7 @@ import connectDB from "./config/db.js";
 import categoryRoutes from "./Category/category.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { userRouter } from "./User/user.routes.js";
+import reviewRouter from "./Reviews/review.routes.js";
 
 connectDB();
 const app = express();
@@ -16,7 +17,6 @@ app.get("/", (req, res) => {
   res.send("🚀 Boro Bazar API Running");
 });
 
-app.use("/categories", categoryRoutes);
 
 // Error Handler (must be last middleware)
 app.use(errorHandler);
@@ -39,8 +39,13 @@ const startServer = async () => {
 
 startServer();
 
+
+// Category routes
+app.use("/api/categories", categoryRoutes);
 // User routes
-app.use('/api', userRouter);
+app.use('/api/users', userRouter);
+// Review routes
+app.use('/api/reviews', reviewRouter);
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

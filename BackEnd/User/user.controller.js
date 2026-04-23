@@ -56,7 +56,10 @@ export default class UserController {
   async updateUser(req, res) {
     try {
       const { id } = req.params;
-      const userData = req.body;
+      const userData = { ...req.body };
+
+      delete userData.password;
+
       const user = await this.userService.updateUser(id, userData);
       res.status(200).json({
         success: true,
@@ -81,6 +84,28 @@ export default class UserController {
       });
     } catch (error) {
       res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+  async updateUserPassword(req, res) {
+    try {
+      const { id } = req.params;
+      const { oldPassword, password, confirmPassword } = req.body;
+
+      if (password !== confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      const user = await this.userService.updatePass(id, { password, oldPassword });
+      res.status(200).json({
+        success: true,
+        message: 'Password updated successfully',
+        data: user,
+      });
+    } catch (error) {
+      res.status(400).json({
         success: false,
         message: error.message,
       });
