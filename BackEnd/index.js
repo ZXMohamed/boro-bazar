@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./config/db.js";
 import categoryRoutes from "./Category/category.routes.js";
+import authRoutes from "./auth/auth.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
   res.send("🚀 Boro Bazar API Running");
 });
 
+app.use("/auth", authRoutes);
 app.use("/categories", categoryRoutes);
 
 // Error Handler (must be last middleware)
