@@ -4,7 +4,7 @@ import { ProductT } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../ui/card";
-import Rate from "./Rate";
+import Rate from "./rate";
 
 const ProductCard = ({ product }: { product: ProductT }) => {
   const { id, name, images, price, rating, stock, originalPrice, slug } =
