@@ -115,7 +115,7 @@ const PopularProducts = () => {
 
       <div className="hidden grid-cols-6 gap-3.5 lg:grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} currency="$"/>
         ))}
       </div>
 
@@ -129,7 +129,7 @@ const PopularProducts = () => {
         <CarouselContent className="py-2">
           {products.map((product) => (
             <CarouselItem key={product.id} className="md:basis-1/3 basis-1/2 pl-5">
-              <ProductCard product={product} />
+              <ProductCard product={product} currency="$"/>
             </CarouselItem>
           ))}
         </CarouselContent>
