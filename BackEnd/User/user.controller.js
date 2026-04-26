@@ -1,10 +1,8 @@
 import UserService from './user.service.js';
-
 export default class UserController {
   constructor() {
     this.userService = new UserService();
   }
-
   async getAllUsers(req, res) {
     try {
       const users = await this.userService.getAllUsers();
@@ -19,7 +17,6 @@ export default class UserController {
       });
     }
   }
-
   async getUserById(req, res) {
     try {
       const { id } = req.params;
@@ -35,7 +32,6 @@ export default class UserController {
       });
     }
   }
-
   async createUser(req, res) {
     try {
       const userData = req.body;
@@ -52,20 +48,30 @@ export default class UserController {
       });
     }
   }
-
   async updateUser(req, res) {
     try {
       const { id } = req.params;
-      const userData = { ...req.body };
 
-      delete userData.password;
+      const userData = {
+        name: req.body.name,
+        profilePicture: req.body.profilePicture,
+        phone: req.body.phone,
+        addresses: req.body.addresses,
+      };
+
+      // نشيل undefined values
+      Object.keys(userData).forEach(
+        (key) => userData[key] === undefined && delete userData[key]
+      );
 
       const user = await this.userService.updateUser(id, userData);
+
       res.status(200).json({
         success: true,
-        message: 'User updated successfully',
+        message: "User updated successfully",
         data: user,
       });
+
     } catch (error) {
       res.status(400).json({
         success: false,
@@ -73,7 +79,6 @@ export default class UserController {
       });
     }
   }
-
   async deleteUser(req, res) {
     try {
       const { id } = req.params;
@@ -111,4 +116,38 @@ export default class UserController {
       });
     }
   }
+
+  async updateUser(req, res) {
+    try {
+      const { id } = req.params;
+      const userData = {
+        name: req.body.name,
+        email: req.body.email,
+        profilePicture: req.body.profilePicture,
+        phone: req.body.phone,
+        addresses: req.body.addresses,
+        role: req.body.role, // Add role to userData
+      };
+
+      // نشيل undefined values
+      Object.keys(userData).forEach(
+        (key) => userData[key] === undefined && delete userData[key]
+      );
+
+      const user = await this.userService.updateUserbyadmin(id, userData);
+
+      res.status(200).json({
+        success: true,
+        message: 'User updated successfully',
+        data: user,
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+
 }

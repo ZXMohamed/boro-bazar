@@ -4,7 +4,7 @@ import categoryRoutes from "./Category/category.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { userRouter } from "./User/user.routes.js";
 import reviewRouter from "./Reviews/review.routes.js";
-
+import authRoutes from "./Auth/auth.routes.js";
 connectDB();
 const app = express();
 
@@ -20,6 +20,14 @@ app.get("/", (req, res) => {
 
 // Error Handler (must be last middleware)
 app.use(errorHandler);
+// Category routes
+app.use("/api/categories", categoryRoutes);
+// User routes
+app.use('/api/users', userRouter);
+// Review routes
+app.use('/api/reviews', reviewRouter);
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
@@ -41,12 +49,7 @@ startServer();
 
 
 // Category routes
-app.use("/api/categories", categoryRoutes);
-// User routes
-app.use('/api/users', userRouter);
-// Review routes
-app.use('/api/reviews', reviewRouter);
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
+// app.listen(3000, () => {
+//   console.log('Server is running on port 3000');
+// });
