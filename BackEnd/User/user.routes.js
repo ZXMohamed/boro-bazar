@@ -1,23 +1,34 @@
 import { Router } from 'express';
 import UserController from './user.controller.js';
+import { protect, admin, user } from '../middleware/authmiddleware.js';
 
 export const userRouter = Router();
 const userController = new UserController();
 
 // Get all users
-userRouter.get('/', userController.getAllUsers.bind(userController));
+// Permission: Admin only
+userRouter.get('/', protect, admin, userController.getAllUsers.bind(userController));
 
 // Get user by ID
-userRouter.get('/:id', userController.getUserById.bind(userController));
+// Permission: User and Admin (user can view own profile, admin can view any profile)
+userRouter.get('/:id', protect, user, userController.getUserById.bind(userController));
 
 // Create new user
-userRouter.post('/', userController.createUser.bind(userController));
+// Permission: Admin only
+userRouter.post('/', protect, admin, userController.createUser.bind(userController));
 
-// Update user
-userRouter.put('/:id', userController.updateUser.bind(userController));
+// Update user to myprofile
+//Permission:User and Admin (user can update own profile, admin can update any profile)
+userRouter.put('/myprofile/:id', protect, user, userController.updateUser.bind(userController));
 
 // Delete user
-userRouter.delete('/:id', userController.deleteUser.bind(userController));
+// Permission: Admin only
+userRouter.delete('/:id', protect, admin, userController.deleteUser.bind(userController));
 
 // update user password
-userRouter.put('/password/:id', userController.updateUserPassword.bind(userController));
+// Permission : User
+userRouter.put('/password/:id', protect, user, userController.updateUserPassword.bind(userController));
+
+// update user 
+// Permission : Admin only
+userRouter.put('/update-user/:id', protect, admin, userController.updateUser.bind(userController));
