@@ -8,6 +8,7 @@ import { Flex, Heading, Text } from "@radix-ui/themes";
 import { FaShoppingCart } from "react-icons/fa";
 
 
+
 interface ProductInterface {
   product: ProductT,
   currency: string;

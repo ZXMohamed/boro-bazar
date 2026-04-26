@@ -11,8 +11,7 @@ api.interceptors.response.use(
         const status = error.response?.status
 
         if (status === 401) {
-            const router = useRouter()
-            router.push("/login")
+            
         }
 
         return Promise.reject(error)

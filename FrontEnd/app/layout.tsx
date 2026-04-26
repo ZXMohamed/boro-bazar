@@ -7,6 +7,7 @@ import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import Providers from "@/providers/provider";
 
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
