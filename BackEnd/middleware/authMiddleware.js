@@ -1,45 +1,30 @@
 import { verifyToken } from "../auth/tokens.js";
-import User from "../auth/user.model.js";
-import { AppError, catchAsync } from "../auth/errors.js";
+import User from "../User/user.schema.js";
 
-export const protect = catchAsync(async (req, res, next) => {
-  let token;
-
-  if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+export const protect = async (req, res, next) => {
+  const token = req.cookies.accessToken;
 
   if (!token) {
-    throw new AppError("No token provided", 401, "NO_TOKEN");
+    return res.status(401).json({ success: false, message: "Not authorized, no token" });
   }
 
   try {
-    const decoded = verifyToken(token);
-    const user = await User.findById(decoded.id).select("-password");
-
-    if (!user) {
-      throw new AppError("User not found", 401, "USER_NOT_FOUND");
-    }
-
-    if (user.isLocked) {
-      throw new AppError("Account is locked", 423, "ACCOUNT_LOCKED");
-    }
-
-    req.user = { id: user._id, email: user.email, role: user.role };
+    const decoded = verifyToken(token, "access");
+    req.user = await User.findById(decoded.id).select("-password");
+    if (!req.user) return res.status(401).json({ success: false, message: "User not found" });
     next();
   } catch (error) {
-    if (error instanceof AppError) throw error;
-
-    if (error.name === "TokenExpiredError") {
-      throw new AppError("Token expired", 401, "TOKEN_EXPIRED");
-    }
-    throw new AppError("Invalid token", 401, "INVALID_TOKEN");
+    console.error(error);
+    return res.status(401).json({ success: false, message: "Not authorized, token failed" });
   }
-});
+};
+
+export const user = (req, res, next) => {
+  if (req.user && req.user.role === "user") return next();
+  res.status(403).json({ success: false, message: "Not authorized" });
+};
 
 export const admin = (req, res, next) => {
-  if (req.user?.role !== "admin") {
-    throw new AppError("Admin access required", 403, "ADMIN_REQUIRED");
-  }
-  next();
+  if (req.user && req.user.role === "admin") return next();
+  res.status(403).json({ success: false, message: "Not authorized as admin" });
 };
