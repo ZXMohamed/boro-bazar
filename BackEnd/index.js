@@ -10,6 +10,7 @@ import authRoutes from "./auth/auth.routes.js";
 import { userRouter } from "./User/user.routes.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
+import reviewRouter from "./Reviews/review.routes.js";
 const app = express();
 
 connectDB();
@@ -39,6 +40,7 @@ const limiter = rateLimit({
 
 app.use("/api", limiter);
 
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -53,6 +55,14 @@ app.use("/api/users", userRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
+// Category routes
+app.use("/api/categories", categoryRoutes);
+// User routes
+app.use('/api/users', userRouter);
+// Review routes
+app.use('/api/reviews', reviewRouter);
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
@@ -70,3 +80,9 @@ const startServer = async () => {
 startServer();
 
 export default app;
+
+// Category routes
+
+// app.listen(3000, () => {
+//   console.log('Server is running on port 3000');
+// });
