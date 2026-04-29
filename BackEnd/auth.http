@@ -1,0 +1,98 @@
+@baseUrl = http://localhost:5000/api
+@contentType = application/json
+
+### --------------------------------------
+### 1. Register a new user
+### --------------------------------------
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!"
+}
+
+### Store the access token from the registration response
+@authToken = {{register.response.body.data.accessToken}}
+
+### --------------------------------------
+### 2. Verify Email (Use the OTP printed in your server console)
+### --------------------------------------
+POST {{baseUrl}}/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+  "email": "johndoe@example.com",
+  "otp": "123456" 
+}
+
+### --------------------------------------
+### 3. Login
+### --------------------------------------
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "johndoe@example.com",
+  "password": "Password123!"
+}
+
+### Store the access token from the login response
+@authToken = {{login.response.body.data.accessToken}}
+
+### --------------------------------------
+### 4. Get Profile (Protected Route)
+### --------------------------------------
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{authToken}}
+
+### --------------------------------------
+### 5. Forgot Password
+### --------------------------------------
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "johndoe@example.com"
+}
+
+### --------------------------------------
+### 6. Verify Reset OTP (Use OTP from console)
+### --------------------------------------
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+  "email": "johndoe@example.com",
+  "otp": "123456"
+}
+
+### --------------------------------------
+### 7. Reset Password
+### --------------------------------------
+POST {{baseUrl}}/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "email": "johndoe@example.com",
+  "otp": "123456",
+  "password": "NewPassword123!",
+  "confirmPassword": "NewPassword123!"
+}
+
+### --------------------------------------
+### 8. Refresh Token (Uses httpOnly Cookie)
+### --------------------------------------
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+
+### --------------------------------------
+### 9. Logout (Clears Cookie)
+### --------------------------------------
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}

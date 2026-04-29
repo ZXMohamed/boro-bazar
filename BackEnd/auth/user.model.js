@@ -1,26 +1,29 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: true,
       trim: true,
-      minLength: [2, "Name is too short"],
+      minlength: 2,
+      maxlength: 50,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
-      unique: [true, "Email must be unique"],
-      trim: true,
+      required: true,
+      unique: true,
       lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minLength: [6, "Password must be at least 6 characters"],
+      minlength: 8,
     },
+    profilePicture: String,
+    phone: String,
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -30,21 +33,68 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: String,
+    refreshToken: String,
+    otp: {
+      code: String,
+      expiresAt: Date,
+      attempts: { type: Number, default: 0 },
+    },
+    passwordChangedAt: Date,
+    lastLogin: Date,
   },
   { timestamps: true }
 );
 
-// Hash password before saving
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, 10);
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+  this.passwordChangedAt = new Date();
 });
 
-// Method to compare password
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
+  return bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
 
-export default User;
+userSchema.methods.generateOTP = function () {
+  const code = (crypto.randomInt(0, 900000) + 100000).toString();
+  this.otp = {
+    code,
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    attempts: 0,
+  };
+  return code;
+};
+
+userSchema.methods.clearOTP = function () {
+  this.otp = { code: null, expiresAt: null, attempts: 0 };
+};
+
+userSchema.statics.findByRefreshToken = function (refreshToken) {
+  return this.findOne({ refreshToken });
+};
+
+userSchema.statics.clearRefreshToken = async function (userId) {
+  await this.findByIdAndUpdate(userId, { refreshToken: null });
+};
+
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject({ virtuals: true });
+  delete obj.password;
+  delete obj.refreshToken;
+  delete obj.otp;
+  delete obj.passwordChangedAt;
+  return obj;
+};
+
+// Use existing model if it exists to avoid OverwriteModelError
+export default mongoose.models.User || mongoose.model("User", userSchema);
