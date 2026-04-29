@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import categoryRoutes from "./Category/category.routes.js";
+import productRoutes from "./Product/product.routes.js";
 import authRoutes from "./auth/auth.routes.js";
 import { userRouter } from "./User/user.routes.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
@@ -61,6 +62,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/users", userRouter);
 app.use('/api/reviews', reviewRouter);
 
