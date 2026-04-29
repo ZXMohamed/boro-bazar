@@ -1,22 +1,32 @@
 import express from "express";
-import * as authController from "./auth.controller.js";
-import { validate, registerSchema, loginSchema, forgotSchema, otpSchema, resetSchema, changeSchema, googleSchema } from "./validation.js";
-import { protect } from "../middleware/authMiddleware.js";
+import {
+  register,
+  login,
+  refreshTokens,
+  logout,
+  verifyEmail,
+  googleAuth,
+  getProfile,
+  changePassword,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
+} from "./auth.controller.js";
+import { protect } from "../middleware/authmiddleware.js";
 
 const router = express.Router();
 
-router.post("/register", validate(registerSchema), authController.register);
-router.post("/login", validate(loginSchema), authController.login);
-router.post("/refresh", authController.refreshTokens);
-router.post("/logout", protect, authController.logout);
-router.post("/google", validate(googleSchema), authController.googleAuth);
+router.post("/signup", register);
+router.post("/login", login);
+router.post("/refresh-token", refreshTokens);
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-otp", verifyOtp);
+router.post("/reset-password", resetPassword);
+router.post("/verify-email", verifyEmail);
+router.post("/google", googleAuth);
 
-router.post("/verify-email", validate(otpSchema), authController.verifyEmail);
-router.post("/forgot-password", validate(forgotSchema), authController.forgotPassword);
-router.post("/verify-otp", validate(otpSchema), authController.verifyOtp);
-router.post("/reset-password", validate(resetSchema), authController.resetPassword);
-
-router.get("/profile", protect, authController.getProfile);
-router.post("/change-password", protect, validate(changeSchema), authController.changePassword);
+router.post("/logout", protect, logout);
+router.get("/profile", protect, getProfile);
+router.put("/change-password", protect, changePassword);
 
 export default router;

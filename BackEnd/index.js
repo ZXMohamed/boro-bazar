@@ -13,6 +13,16 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import reviewRouter from "./Reviews/review.routes.js";
 const app = express();
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+    success: false,
+    message: "Too many auth requests, try again later",
+    code: "AUTH_RATE_LIMIT",
+  },
+});
+
 connectDB();
 
 app.use(helmet());
@@ -49,20 +59,13 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRouter);
+app.use('/api/reviews', reviewRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
-// Category routes
-app.use("/api/categories", categoryRoutes);
-// User routes
-app.use('/api/users', userRouter);
-// Review routes
-app.use('/api/reviews', reviewRouter);
-// Auth routes
-app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 

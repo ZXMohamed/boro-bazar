@@ -1,54 +1,52 @@
-import User from "./user.model.js";
+import User from "../User/user.schema.js";
 import { sendEmail } from "../email/emailService.js";
 import { AppError } from "./errors.js";
 
 const sendOtpEmail = async (user, otp) => {
-  await sendEmail({
-    to: user.email,
-    subject: "Boro Bazar - Password Reset",
-    html: `
-      <h2>Password Reset</h2>
-      <p>Hello ${user.name},</p>
-      <p>Your OTP code is: <strong>${otp}</strong></p>
-      <p>This code expires in 10 minutes.</p>
-      <p>If you didn't request this, ignore this email.</p>
-    `,
-  });
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Boro Bazar - Password Reset OTP",
+      html: `<p>Your OTP: <strong>${otp}</strong></p><p>Expires in 10 minutes.</p>`,
+    });
+  } catch (error) {
+    console.error("Failed to send OTP email:", error.message);
+  }
 };
 
 export const requestReset = async ({ email }) => {
-  const user = await User.findOne({ email });
+  const normalizedEmail = email?.toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user) {
-    return { message: "If an account exists, an OTP has been sent" };
-  }
-
-  if (user.authProvider === "google") {
-    throw new AppError("Google accounts cannot reset password", 400, "GOOGLE_ACCOUNT");
+  if (!user || user.authProvider === "google") {
+    return { message: "If email exists, OTP has been sent" };
   }
 
   const otp = user.generateOTP();
   await user.save();
   await sendOtpEmail(user, otp);
 
-  return { message: "If an account exists, an OTP has been sent" };
+  return { message: "If email exists, OTP has been sent" };
 };
 
 export const verifyOtp = async ({ email, otp }) => {
-  const user = await User.findOne({ email });
+  const normalizedEmail = email?.toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user?.otp?.code) {
-    throw new AppError("No OTP requested", 400, "NO_OTP");
-  }
+  if (!user) throw new AppError("Invalid OTP or email", 400, "INVALID_OTP");
 
-  if (user.otp.attempts >= 5) {
-    user.clearOTP();
-    await user.save();
-    throw new AppError("Too many failed attempts. Request a new OTP", 400, "TOO_MANY_ATTEMPTS");
-  }
+  if (!user.otp || !user.otp.code) throw new AppError("No OTP requested. Call /forgot-password first.", 400, "NO_OTP");
 
   if (user.otp.expiresAt < new Date()) {
-    throw new AppError("OTP expired. Request a new one", 400, "OTP_EXPIRED");
+    user.clearOTP();
+    await user.save();
+    throw new AppError("OTP expired", 400, "OTP_EXPIRED");
+  }
+
+  if (user.otp.attempts >= 3) {
+    user.clearOTP();
+    await user.save();
+    throw new AppError("Max OTP attempts reached", 429, "OTP_MAX_ATTEMPTS");
   }
 
   if (user.otp.code !== otp) {
@@ -57,27 +55,36 @@ export const verifyOtp = async ({ email, otp }) => {
     throw new AppError("Invalid OTP", 400, "INVALID_OTP");
   }
 
-  return { message: "OTP verified" };
+  user.clearOTP();
+  await user.save();
+
+  return { message: "OTP verified successfully" };
 };
 
 export const verifyEmail = async ({ email, otp }) => {
-  const user = await User.findOne({ email });
+  const normalizedEmail = email?.toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user) throw new AppError("User not found", 404);
-  if (user.isVerified) return { message: "Email already verified" };
+  if (!user) throw new AppError("Invalid OTP or email", 400, "INVALID_OTP");
 
-  if (!user.otp?.code) {
-    throw new AppError("No verification code found", 400);
-  }
+  if (!user.otp.code) throw new AppError("No OTP requested", 400, "NO_OTP");
 
   if (user.otp.expiresAt < new Date()) {
-    throw new AppError("Code expired", 400);
+    user.clearOTP();
+    await user.save();
+    throw new AppError("OTP expired", 400, "OTP_EXPIRED");
+  }
+
+  if (user.otp.attempts >= 3) {
+    user.clearOTP();
+    await user.save();
+    throw new AppError("Max OTP attempts reached", 429, "OTP_MAX_ATTEMPTS");
   }
 
   if (user.otp.code !== otp) {
     user.otp.attempts += 1;
     await user.save();
-    throw new AppError("Invalid code", 400);
+    throw new AppError("Invalid OTP", 400, "INVALID_OTP");
   }
 
   user.isVerified = true;
@@ -88,23 +95,11 @@ export const verifyEmail = async ({ email, otp }) => {
 };
 
 export const reset = async ({ email, otp, password }) => {
-  const user = await User.findOne({ email });
+  await verifyOtp({ email, otp });
 
-  if (!user?.otp?.code) {
-    throw new AppError("Invalid request", 400, "INVALID_REQUEST");
-  }
-
-  if (user.otp.expiresAt < new Date()) {
-    throw new AppError("OTP expired. Request a new one", 400, "OTP_EXPIRED");
-  }
-
-  if (user.otp.code !== otp) {
-    throw new AppError("Invalid OTP", 400, "INVALID_OTP");
-  }
-
+  const normalizedEmail = email?.toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
   user.password = password;
-  user.clearOTP();
-  user.refreshToken = null;
   await user.save();
 
   return { message: "Password reset successfully" };

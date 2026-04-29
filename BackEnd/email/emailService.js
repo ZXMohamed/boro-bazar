@@ -1,13 +1,13 @@
 export const sendEmail = async ({ to, subject, html }) => {
-  if (process.env.NODE_ENV === "development") {
-    console.log("\n========== EMAIL (DEV MODE) ==========");
-    console.log(`To: ${to}`);
-    console.log(`Subject: ${subject}`);
-    console.log("Body:");
-    console.log(html);
-    console.log("========================================\n");
-    return { success: true, messageId: "dev-" + Date.now() };
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("\n========== EMAIL (DEV MODE) ==========");
+  //   console.log(`To: ${to}`);
+  //   console.log(`Subject: ${subject}`);
+  //   console.log("Body:");
+  //   console.log(html);
+  //   console.log("========================================\n");
+  //   return { success: true, messageId: "dev-" + Date.now() };
+  // }
 
   const emailProvider = process.env.EMAIL_PROVIDER || "console";
 

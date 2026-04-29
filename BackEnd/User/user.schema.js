@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -64,7 +64,6 @@ userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-
 userSchema.methods.generateOTP = function () {
   const code = (crypto.randomInt(0, 900000) + 100000).toString();
   this.otp = {
@@ -96,5 +95,6 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-// Use existing model if it exists to avoid OverwriteModelError
-export default mongoose.models.User || mongoose.model("User", userSchema);
+const User = mongoose.models.User || model("User", userSchema);
+
+export default User;

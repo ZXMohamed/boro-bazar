@@ -1,5 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
-import User from "./user.model.js";
+import User from "../User/user.schema.js";
 import { generateTokens } from "./tokens.js";
 import { AuthenticationError, ConflictError } from "./errors.js";
 

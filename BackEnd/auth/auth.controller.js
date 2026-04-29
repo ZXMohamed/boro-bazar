@@ -1,20 +1,36 @@
 import * as authService from "./auth.service.js";
 import * as otpService from "./otpService.js";
-import { catchAsync, sendSuccess } from "./errors.js";
+import { catchAsync, sendSuccess, AppError } from "./errors.js";
 
-const sendTokenResponse = (res, userWithTokens, message, statusCode = 200) => {
-  const { accessToken, refreshToken, ...user } = userWithTokens;
+const ACCESS_COOKIE_MAX_AGE = 15 * 60 * 1000; // 15 minutes
+const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-  const cookieOptions = {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+const getCookieOptions = (maxAge) => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge,
+});
+
+const setTokenCookies = (res, { accessToken, refreshToken }) => {
+  res.cookie("accessToken", accessToken, getCookieOptions(ACCESS_COOKIE_MAX_AGE));
+  res.cookie("refreshToken", refreshToken, getCookieOptions(REFRESH_COOKIE_MAX_AGE));
+};
+
+const clearTokenCookies = (res) => {
+  const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   };
+  res.clearCookie("accessToken", options);
+  res.clearCookie("refreshToken", options);
+};
 
-  res.cookie("refreshToken", refreshToken, cookieOptions);
-
-  sendSuccess(res, { user, accessToken }, message, statusCode);
+const sendTokenResponse = (res, userWithTokens, message, statusCode = 200) => {
+  const { accessToken, refreshToken, ...user } = userWithTokens;
+  setTokenCookies(res, { accessToken, refreshToken });
+  sendSuccess(res, { user }, message, statusCode);
 };
 
 export const register = catchAsync(async (req, res) => {
@@ -23,36 +39,24 @@ export const register = catchAsync(async (req, res) => {
 });
 
 export const login = catchAsync(async (req, res) => {
-  const result = await authService.login(req.body);
+  const { email, password, name } = req.body;
+  const result = await authService.login({ email, password, name });
   sendTokenResponse(res, result, "Login successful");
 });
 
 export const refreshTokens = catchAsync(async (req, res) => {
-  const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-  
-  const tokens = await authService.refreshTokens({ refreshToken });
-  
-  const cookieOptions = {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  };
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) throw new AppError("Refresh token required", 400, "TOKEN_REQUIRED");
 
-  res.cookie("refreshToken", tokens.refreshToken, cookieOptions);
-  
-  sendSuccess(res, { accessToken: tokens.accessToken }, "Tokens refreshed");
+  const tokens = await authService.refreshTokens({ refreshToken });
+  setTokenCookies(res, tokens);
+
+  sendSuccess(res, null, "Tokens refreshed");
 });
 
 export const logout = catchAsync(async (req, res) => {
   await authService.logout(req.user.id);
-  
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  });
-
+  clearTokenCookies(res);
   sendSuccess(res, null, "Logged out successfully");
 });
 
