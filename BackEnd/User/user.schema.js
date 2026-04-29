@@ -1,79 +1,100 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
-
-const { Schema } = mongoose;
+import crypto from "crypto";
 
 const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: true,
       trim: true,
-      minlength: [2, "Name is too short"],
+      minlength: 2,
+      maxlength: 50,
     },
-
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
       unique: true,
       lowercase: true,
       trim: true,
-      match: /.+\@.+\..+/,
     },
-
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      minlength: 8,
     },
-
-    profilePicture: {
-      type: String,
-      default: null,
-    },
-
-    phone: {
-      type: String,
-      default: null,
-    },
-
-    addresses: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
-
+    profilePicture: String,
+    phone: String,
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
     },
-
     isVerified: {
       type: Boolean,
       default: false,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: String,
+    refreshToken: String,
+    otp: {
+      code: String,
+      expiresAt: Date,
+      attempts: { type: Number, default: 0 },
+    },
+    passwordChangedAt: Date,
+    lastLogin: Date,
   },
   { timestamps: true }
 );
 
-/* =======================
-   HASH PASSWORD
-======================= */
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+  this.passwordChangedAt = new Date();
 });
 
-/* =======================
-   COMPARE PASSWORD
-======================= */
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
+  return bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
+userSchema.methods.generateOTP = function () {
+  const code = (crypto.randomInt(0, 900000) + 100000).toString();
+  this.otp = {
+    code,
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    attempts: 0,
+  };
+  return code;
+};
+
+userSchema.methods.clearOTP = function () {
+  this.otp = { code: null, expiresAt: null, attempts: 0 };
+};
+
+userSchema.statics.findByRefreshToken = function (refreshToken) {
+  return this.findOne({ refreshToken });
+};
+
+userSchema.statics.clearRefreshToken = async function (userId) {
+  await this.findByIdAndUpdate(userId, { refreshToken: null });
+};
+
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject({ virtuals: true });
+  delete obj.password;
+  delete obj.refreshToken;
+  delete obj.otp;
+  delete obj.passwordChangedAt;
+  return obj;
+};
+
+const User = mongoose.models.User || model("User", userSchema);
 
 export default User;
