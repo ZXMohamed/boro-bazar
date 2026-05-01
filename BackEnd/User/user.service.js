@@ -27,9 +27,6 @@ export default class UserService {
 
     async createUser(userData) {
         try {
-            const { password } = userData;
-            const hashedPassword = await this.bcrypt.hash(password, 10);
-            userData.password = hashedPassword;
             const newUser = await this.user.create(userData);
             return newUser;
         } catch (error) {
@@ -81,6 +78,19 @@ export default class UserService {
             return user;
         } catch (error) {
             throw new Error(`Error updating password: ${error.message}`);
+        }
+    }
+    async updateUserbyadmin(id, userData) {
+        try {
+            const updatedUser = await this.user.findByIdAndUpdate(
+                id,
+                userData,
+                { new: true }
+            ).select('-password');
+            if (!updatedUser) throw new Error('User not found');
+            return updatedUser;
+        } catch (error) {
+            throw new Error(`Error updating user: ${error.message}`);
         }
     }
 }

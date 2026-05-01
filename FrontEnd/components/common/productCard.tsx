@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
 import Rate from "./Rate";
 
+
 interface ProductInterface {
   product: ProductT;
   currency: string;
