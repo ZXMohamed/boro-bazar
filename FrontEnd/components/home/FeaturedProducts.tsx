@@ -1,4 +1,3 @@
-import ProductCard from "@/components/common/ProductCard";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -10,6 +9,7 @@ import {
 import { ProductT } from "@/types/product";
 import Link from "next/link";
 import { LuMoveRight } from "react-icons/lu";
+import ProductCard from "../common/ProductCard";
 
 const products: ProductT[] = [
   {
@@ -21,6 +21,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 120,
     originalPrice: 150,
+    inCart: false,
     rating: 4.5,
     reviews: 32,
     stock: 25,
@@ -34,6 +35,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 350,
     originalPrice: 400,
+    inCart: false,
     rating: 4.7,
     reviews: 18,
     stock: 12,
@@ -47,6 +49,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 30,
     originalPrice: 35,
+    inCart: false,
     rating: 4.3,
     reviews: 54,
     stock: 40,
@@ -60,6 +63,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 25,
     originalPrice: 30,
+    inCart: false,
     rating: 4.2,
     reviews: 21,
     stock: 30,
@@ -73,6 +77,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 45,
     originalPrice: 55,
+    inCart: false,
     rating: 4.6,
     reviews: 27,
     stock: 20,
@@ -86,6 +91,7 @@ const products: ProductT[] = [
     images: ["/product1.png", "/product1.png"],
     price: 90,
     originalPrice: 110,
+    inCart: false,
     rating: 4.4,
     reviews: 39,
     stock: 15,
@@ -111,7 +117,7 @@ const FeaturedProducts = () => {
 
       <div className="hidden grid-cols-6 gap-3.5 lg:grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} currency="$"/>
+          <ProductCard key={product.id} product={product} currency="$" />
         ))}
       </div>
 
@@ -128,7 +134,7 @@ const FeaturedProducts = () => {
               key={product.id}
               className="basis-1/2 pl-5 md:basis-1/3"
             >
-              <ProductCard product={product} currency="$"/>
+              <ProductCard product={product} currency="$" />
             </CarouselItem>
           ))}
         </CarouselContent>
