@@ -1,12 +1,18 @@
-import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { ProductListT } from "@/types/product";
+"use client";
 
+import { ProductListT } from "@/types/product";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 function ProductList({ title, description, children }: ProductListT) {
   return (
     <Card className="gap-y-4">
-      <CardHeader>
+      <CardHeader className="">
         <CardTitle>
           <h1 className="text-primary-text text-[20px] font-medium">{title}</h1>
         </CardTitle>
@@ -14,7 +20,7 @@ function ProductList({ title, description, children }: ProductListT) {
           <p className="text-secondary-text text-[15px]">{description}</p>
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-0">{children}</CardContent>
+      <CardContent className="p-0 border-t">{children}</CardContent>
     </Card>
   );
 }
