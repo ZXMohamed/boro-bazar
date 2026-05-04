@@ -58,14 +58,24 @@ export const getReviews = asyncHandler(async (req, res, next) => {
   const filter = {};
   if (productId) filter.productId = productId;
 
-  const reviews = await Review.find(filter)
-    .limit(limit)
-    .skip((page - 1) * limit)
-    .populate('reviewer', 'name email');
+  const [reviews, total] = await Promise.all([
+    Review.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .populate('reviewer', 'name email'),
+    Review.countDocuments(filter),
+  ]);
 
   res.status(200).json({
     success: true,
     data: reviews,
+    pagination: {
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      limit,
+    },
   });
 });
 
