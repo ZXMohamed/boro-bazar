@@ -60,6 +60,7 @@ export const getReviews = asyncHandler(async (req, res, next) => {
 
   const [reviews, total] = await Promise.all([
     Review.find(filter)
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .populate('reviewer', 'name email'),
