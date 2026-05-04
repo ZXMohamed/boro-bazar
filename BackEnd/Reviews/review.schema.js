@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from 'mongoose';
 
 const reviewSchema = new Schema(
   {
@@ -14,18 +14,20 @@ const reviewSchema = new Schema(
     },
     reviewer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: 'Product',
       required: true,
     },
   },
   { timestamps: true }
 );
 
-const Review = mongoose.models.Review || model("Review", reviewSchema);
+reviewSchema.index({ reviewer: 1, productId: 1 }, { unique: true });
+
+const Review = mongoose.models.Review || model('Review', reviewSchema);
 
 export default Review;

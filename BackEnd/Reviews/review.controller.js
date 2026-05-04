@@ -1,27 +1,40 @@
-import Review from "./review.schema.js";
-import CustomError from "../utils/customError.js";
-import mongoose from "mongoose";
-import asyncHandler from "../utils/asyncHandler.js";
+import Review from './review.schema.js';
+import CustomError from '../utils/customError.js';
+import mongoose from 'mongoose';
+import asyncHandler from '../utils/asyncHandler.js';
 
 ////////////////////////////
 // Create Review
 ////////////////////////////
 export const createReview = asyncHandler(async (req, res, next) => {
-  const { rating, comment, reviewerName, productId } = req.body;
+  const { rating, comment, productId } = req.body;
 
-  if (!rating || !comment || !reviewerName || !productId) {
+  if (!rating || !comment || !productId) {
     return next(
       new CustomError(
-        "All fields are required (rating, comment, reviewerName, productId)",
+        'All fields are required (rating, comment, productId)',
         400
       )
     );
   }
 
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return next(new CustomError('Invalid product ID', 400));
+  }
+
+  const existingReview = await Review.findOne({
+    reviewer: req.user._id,
+    productId,
+  });
+
+  if (existingReview) {
+    return next(new CustomError('You have already reviewed this product', 400));
+  }
+
   const review = await Review.create({
     rating,
     comment,
-    reviewerName,
+    reviewer: req.user._id,
     productId,
   });
 
@@ -32,19 +45,26 @@ export const createReview = asyncHandler(async (req, res, next) => {
 });
 
 ////////////////////////////
-// Get All Reviews
+// Get Reviews with Pagination
 ////////////////////////////
-export const getReviews = asyncHandler(async (req, res) => {
-  const filter = {};
-  if (req.query.productId) {
-    filter.productId = req.query.productId;
+export const getReviews = asyncHandler(async (req, res, next) => {
+  const limit = 10;
+  const { page = 1, productId } = req.query;
+
+  if (productId && !mongoose.Types.ObjectId.isValid(productId)) {
+    return next(new CustomError('Invalid product ID', 400));
   }
 
-  const reviews = await Review.find(filter);
+  const filter = {};
+  if (productId) filter.productId = productId;
+
+  const reviews = await Review.find(filter)
+    .limit(limit)
+    .skip((page - 1) * limit)
+    .populate('reviewer', 'name email');
 
   res.status(200).json({
     success: true,
-    results: reviews.length,
     data: reviews,
   });
 });
@@ -54,13 +74,17 @@ export const getReviews = asyncHandler(async (req, res) => {
 ////////////////////////////
 export const updateReview = asyncHandler(async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.reviewId)) {
-    return next(new CustomError("Invalid review ID", 400));
+    return next(new CustomError('Invalid review ID', 400));
   }
 
   const review = await Review.findById(req.params.reviewId);
 
   if (!review) {
-    return next(new CustomError("Review not found!", 404));
+    return next(new CustomError('Review not found!', 404));
+  }
+
+  if (review.reviewer.toString() !== req.user._id.toString()) {
+    return next(new CustomError('You are not the owner of this review', 403));
   }
 
   if (req.body.rating) review.rating = req.body.rating;
@@ -79,17 +103,23 @@ export const updateReview = asyncHandler(async (req, res, next) => {
 ////////////////////////////
 export const deleteReview = asyncHandler(async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.reviewId)) {
-    return next(new CustomError("Invalid review ID", 400));
+    return next(new CustomError('Invalid review ID', 400));
   }
 
-  const review = await Review.findByIdAndDelete(req.params.reviewId);
+  const review = await Review.findById(req.params.reviewId);
 
   if (!review) {
-    return next(new CustomError("Review not found!", 404));
+    return next(new CustomError('Review not found!', 404));
   }
+
+  if (review.reviewer.toString() !== req.user._id.toString()) {
+    return next(new CustomError('You are not the owner of this review', 403));
+  }
+
+  await review.deleteOne();
 
   res.status(200).json({
     success: true,
-    message: "Review deleted successfully",
+    message: 'Review deleted successfully',
   });
 });
