@@ -1,4 +1,4 @@
-import ProductCard from "@/components/common/ProductCard";
+import ProductCard from "@/components/common/productCard";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,

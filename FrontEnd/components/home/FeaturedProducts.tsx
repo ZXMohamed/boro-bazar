@@ -9,7 +9,7 @@ import {
 import { ProductT } from "@/types/product";
 import Link from "next/link";
 import { LuMoveRight } from "react-icons/lu";
-import ProductCard from "../common/ProductCard";
+import ProductCard from "@/components/common/productCard";
 
 const products: ProductT[] = [
   {

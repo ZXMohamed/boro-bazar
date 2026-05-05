@@ -1,5 +1,5 @@
-import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/footer";
+import Navbar from "@/components/layout/navbar";
 import Providers from "@/providers/provider";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
@@ -28,7 +28,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} antialiased`}
     >
-      <body>
+      <body suppressHydrationWarning>
         <Providers>
           <Navbar />
           <main>{children}</main>
