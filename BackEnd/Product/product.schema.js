@@ -28,9 +28,22 @@ const productSchema = new Schema(
       ref: "Category",
       required: true,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
+
+// Indexes for performance
+productSchema.index({ categoryId: 1 });
+productSchema.index({ isFeatured: 1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ price: 1 });
+
+// Text index for search
+productSchema.index({ name: "text", description: "text" });
 
 const Product =
   mongoose.models.Product || model("Product", productSchema);

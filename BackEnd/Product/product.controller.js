@@ -5,6 +5,8 @@ import CustomError from "../utils/customError.js";
 import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
+import { getProductsSchema } from "./product.validation.js";
+import { getProductsService } from "./product.service.js";
 
 ////////////////////////////
 // Create Product
@@ -14,7 +16,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     return next(new CustomError("Product image is required!", 400));
   }
 
-  const { name, description, price, categoryId } = req.body;
+  const { name, description, price, categoryId, isFeatured } = req.body;
 
   if (!name || !description || !price || !categoryId) {
     return next(new CustomError("Please provide all required fields (name, description, price, categoryId)", 400));
@@ -31,6 +33,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     description,
     price,
     categoryId,
+    isFeatured: isFeatured === "true" || isFeatured === true,
     slug: slugify(name, { lower: true }),
     image: {
       id: result.public_id,
@@ -47,18 +50,24 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 ////////////////////////////
 // Get Products
 ////////////////////////////
-export const getProducts = asyncHandler(async (req, res) => {
-  const filter = {};
-  if (req.query.categoryId) {
-    filter.categoryId = req.query.categoryId;
+export const getProducts = asyncHandler(async (req, res, next) => {
+  // 1. Validate Query Params
+  const { error, value } = getProductsSchema.validate(req.query, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+
+  if (error) {
+    return next(new CustomError(error.details.map((d) => d.message).join(", "), 400));
   }
 
-  const products = await Product.find(filter).populate("categoryId", "name slug image");
+  // 2. Call Service
+  const result = await getProductsService(value);
 
+  // 3. Send Response
   res.status(200).json({
     success: true,
-    results: products.length,
-    data: products,
+    ...result,
   });
 });
 
@@ -96,7 +105,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     return next(new CustomError("Product not found!", 404));
   }
 
-  const { name, description, price, categoryId } = req.body;
+  const { name, description, price, categoryId, isFeatured } = req.body;
 
   if (name) {
     product.name = name;
@@ -104,6 +113,9 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   }
   if (description) product.description = description;
   if (price) product.price = price;
+  if (isFeatured !== undefined) {
+    product.isFeatured = isFeatured === "true" || isFeatured === true;
+  }
   if (categoryId) {
       if (!mongoose.Types.ObjectId.isValid(categoryId)) {
         return next(new CustomError("Invalid category ID", 400));
