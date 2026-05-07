@@ -5,7 +5,7 @@ import { TProductDetails } from '../_types/productDetails.type'
 const ProductImages = ({ product }: { product: TProductDetails }) => {
     const [image, setImage] = useState<string>(product.images[0])
     return (
-        <div className='flex flex-col space-y-5 m-4'>
+        <div className='flex flex-col space-y-5 '>
             <div className='w-[374px] h-[395px]  border border-[#C1C1C1] '>
                 <img  src={image} alt={product.title} className='w-[349.7px] h-[349.7px] object-contain  mx-auto' />
             </div>

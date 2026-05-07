@@ -1,4 +1,4 @@
-export type Review = {
+export type TReview = {
   rating: number;
   comment: string;
   date: string;
@@ -37,7 +37,7 @@ export type TProductDetails = {
   shippingInformation: string;
   availabilityStatus: string;
 
-  reviews: Review[];
+  reviews: TReview[];
 
   returnPolicy: string;
   minimumOrderQuantity: number;
