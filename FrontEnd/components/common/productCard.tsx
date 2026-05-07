@@ -4,7 +4,7 @@ import { Flex, Heading, Text } from "@radix-ui/themes";
 import Image from "next/image";
 import Link from "next/link";
 import { FaShoppingCart } from "react-icons/fa";
-import Rate from "./Rate";
+import Rate from "./rate";
 
 
 interface ProductInterface {
