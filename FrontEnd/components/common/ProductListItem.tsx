@@ -13,7 +13,7 @@ interface ProductListItemInterface {
   currency: string;
   applyQuantity?: boolean;
   onQuantityChange?: (id: string, quantity: number, price: number) => void;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
   className?: string;
 }
 
@@ -21,7 +21,7 @@ function ProductListItem({ product: { id = "", images = [""], brand = "", name =
   return (
     <div
       className={cn(
-        "flex w-full justify-between border-t border-b py-3",
+        "flex w-full justify-between border-b py-3",
         className,
       )}
     >

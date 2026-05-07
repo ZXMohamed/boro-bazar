@@ -1,11 +1,11 @@
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import Providers from "@/providers/provider";
+import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import "@radix-ui/themes/styles.css";
-import Providers from "@/providers/provider";
 
 
 const inter = Inter({
@@ -33,7 +33,7 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Footer />
-          <Toaster />
+          <Toaster position="bottom-right" />
         </Providers>
       </body>
     </html>

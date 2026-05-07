@@ -103,9 +103,9 @@ const Navbar = () => {
           <Link href="/">
             <span className="sr-only">Home</span>
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="BoroBazar Logo"
-              className="h-auto w-36 md:w-40"
+              className="h-auto w-full"
               loading="eager"
               width={160}
               height={40}

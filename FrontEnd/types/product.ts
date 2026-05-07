@@ -6,6 +6,7 @@ export interface ProductT {
   images: string[];
   price: number;
   originalPrice?: number;
+  inCart?: boolean;
   slug?: string;
   description?: string;
   stock?: number;
