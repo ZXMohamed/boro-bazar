@@ -1,5 +1,5 @@
 import Footer from "@/components/layout/Footer";
-import Navbar from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/navbar";
 import Providers from "@/providers/provider";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";

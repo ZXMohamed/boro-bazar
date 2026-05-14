@@ -1,30 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
 export interface ProductT {
-  id: string;
+  image: {
+    url: string;
+    id: string;
+  };
+  _id: string;
   name: string;
-  images: string[];
+  slug: string;
+  description: string;
   price: number;
-  originalPrice?: number;
-  inCart?: boolean;
-  slug?: string;
-  description?: string;
-  stock?: number;
-  category?: string;
-  rating?: number;
-  reviews?: number;
-  brand?: string;
+  categoryId: {
+    image: {
+      url: string;
+      id: string;
+    };
+    _id: string;
+    name: string;
+    slug: string;
+  };
+  isFeatured: boolean;
+  reviews: any[];
+  rating: number;
+  numReviews: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CategoryT {
+  image: {
+    url: string;
+    id: string;
+  };
+  _id: string;
+  name: string;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductsParamsT {
-  page?: number;
-  limit?: number;
   search?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  rating?: number;
-  sort?: string;
+  sort?: "featured" | "latest" | "price-asc" | "price-desc";
+  categoryId?: number;
+  exclude?: string | number;
+  limit?: number;
 }
 
 export interface ProductsResponseT {
@@ -33,15 +54,6 @@ export interface ProductsResponseT {
   page: number;
   limit: number;
   pages: number;
-}
-
-export interface CategoryT {
-  id: string;
-  name: string;
-  slug: string;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ProductListT {

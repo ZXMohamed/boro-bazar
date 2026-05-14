@@ -48,19 +48,15 @@ export interface VerifyOtpResponseT {
 export interface AuthState {
   // State
   user: UserT | null;
-  token: string | null;
-  refreshToken: string | null;
   isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
 
   // Actions
   setUser: (user: UserT | null) => void;
-  setToken: (token: string | null) => void;
-  setRefreshToken: (refreshToken: string | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
-  setAuth: (user: UserT, token: string, refreshToken?: string) => void;
+  setAuth: (user: UserT) => void;
   logout: () => void;
   clearError: () => void;
   updateUser: (user: Partial<UserT>) => void;

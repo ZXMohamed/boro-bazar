@@ -1,4 +1,4 @@
-import ProductCard from "@/components/common/ProductCard";
+import ProductCard from "@/components/common/productCard";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -11,88 +11,7 @@ import { ProductT } from "@/types/product";
 import Link from "next/link";
 import { LuMoveRight } from "react-icons/lu";
 
-const products: ProductT[] = [
-  {
-    id: "1",
-    name: "Fresh Organic Apples",
-    slug: "",
-    description: "Crisp and sweet organic apples sourced from local farms.",
-    category: "fruits-vegetables",
-    images: ["/product1.png", "/product1.png"],
-    price: 120,
-    originalPrice: 150,
-    rating: 4.5,
-    reviews: 32,
-    stock: 25,
-  },
-  {
-    id: "2",
-    name: "Premium Beef Steak",
-    slug: "",
-    description: "High-quality fresh beef steak, perfect for grilling.",
-    category: "meats-seafood",
-    images: ["/product1.png", "/product1.png"],
-    price: 350,
-    originalPrice: 400,
-    rating: 4.7,
-    reviews: 18,
-    stock: 12,
-  },
-  {
-    id: "3",
-    name: "Full Cream Milk 1L",
-    slug: "",
-    description: "Rich and creamy full-fat milk for daily use.",
-    category: "breakfast-dairy",
-    images: ["/product1.png", "/product1.png"],
-    price: 30,
-    originalPrice: 35,
-    rating: 4.3,
-    reviews: 54,
-    stock: 40,
-  },
-  {
-    id: "4",
-    name: "Whole Wheat Bread",
-    slug: "",
-    description: "Freshly baked healthy whole wheat bread.",
-    category: "breads-bakery",
-    images: ["/product1.png", "/product1.png"],
-    price: 25,
-    originalPrice: 30,
-    rating: 4.2,
-    reviews: 21,
-    stock: 30,
-  },
-  {
-    id: "5",
-    name: "Orange Juice 1L",
-    slug: "",
-    description: "Refreshing natural orange juice with no added sugar.",
-    category: "beverages",
-    images: ["/product1.png", "/product1.png"],
-    price: 45,
-    originalPrice: 55,
-    rating: 4.6,
-    reviews: 27,
-    stock: 20,
-  },
-  {
-    id: "6",
-    name: "Frozen Chicken Nuggets",
-    slug: "",
-    description: "Crispy frozen chicken nuggets, quick and easy meal.",
-    category: "frozen-foods",
-    images: ["/product1.png", "/product1.png"],
-    price: 90,
-    originalPrice: 110,
-    rating: 4.4,
-    reviews: 39,
-    stock: 15,
-  },
-];
-
-const LatestProducts = () => {
+const LatestProducts = ({ products }: { products: ProductT[] }) => {
   return (
     <section className="sec-layout flex flex-col gap-5">
       <div className="flex items-center justify-between">
@@ -110,7 +29,7 @@ const LatestProducts = () => {
 
       <div className="hidden grid-cols-6 gap-3.5 lg:grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} currency="$" />
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
 
@@ -124,10 +43,10 @@ const LatestProducts = () => {
         <CarouselContent className="py-2">
           {products.map((product) => (
             <CarouselItem
-              key={product.id}
+              key={product._id}
               className="basis-1/2 pl-5 md:basis-1/3"
             >
-              <ProductCard product={product} currency="$" />
+              <ProductCard product={product} />
             </CarouselItem>
           ))}
         </CarouselContent>
