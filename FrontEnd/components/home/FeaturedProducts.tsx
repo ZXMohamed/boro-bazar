@@ -9,7 +9,7 @@ import {
 import { ProductT } from "@/types/product";
 import Link from "next/link";
 import { LuMoveRight } from "react-icons/lu";
-import ProductCard from "../common/productCard";
+import ProductCard from "@/components/common/productCard";
 
 const FeaturedProducts = ({ products }: { products: ProductT[] }) => {
   return (

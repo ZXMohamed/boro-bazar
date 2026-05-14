@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import { IoMdClose } from "react-icons/io";
-import Rate from "./Rate";
+import Rate from "./rate";
 import { offerCalculate } from "@/utils/offerCalculate";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

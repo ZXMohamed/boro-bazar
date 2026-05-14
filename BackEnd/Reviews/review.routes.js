@@ -1,23 +1,24 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   createReview,
   getReviews,
   updateReview,
   deleteReview,
-} from "./review.controller.js";
+} from './review.controller.js';
+import { protect } from '../middleware/authmiddleware.js';
 
 const router = Router();
 
 /////////////////(CreateReview)\\\\\\\\\\\\\\\\\\\
-router.post("/", createReview);
+router.post('/', protect, createReview);
 
 /////////////////(GetReviews)\\\\\\\\\\\\\\\\\\\\\
-router.get("/", getReviews);
+router.get('/', getReviews);
 
 /////////////////(UpdateReview)\\\\\\\\\\\\\\\\\\\
-router.patch("/:reviewId", updateReview);
+router.patch('/:reviewId', protect, updateReview);
 
 /////////////////(DeleteReview)\\\\\\\\\\\\\\\\\\\
-router.delete("/:reviewId", deleteReview);
+router.delete('/:reviewId', protect, deleteReview);
 
 export default router;
