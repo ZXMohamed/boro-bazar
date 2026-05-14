@@ -3,16 +3,16 @@ import { useState } from "react"
 import HeadingProductsSidebar from "./HeadingProductsSidebar"
 import { Input } from "@/components/ui/input";
 import { useFilters } from "../../_hooks/useFilters";
-import { TCategory } from "@/types/category";
+import { CategoryT } from "@/types/product";
 
-const CategoryFilter = ({categories}: {categories: TCategory[]}) => {
+const CategoryFilter = ({categories}: {categories: CategoryT[]}) => {
   const [open, setOpen] = useState(true);
   const { updateCategory, allCategories } = useFilters()
-  const isChecked = (category: TCategory) => {
+  const isChecked = (category: CategoryT) => {
     return allCategories.includes(category.slug)
   }
 
-  const categoryList = categories?.map((category: TCategory) => {
+  const categoryList = categories?.map((category: CategoryT) => {
     return (
       <div key={category.slug} className='flex gap-3 items-center my-2 '>
         <Input type='checkbox' id={category.slug}

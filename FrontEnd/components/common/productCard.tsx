@@ -3,73 +3,42 @@ import { ProductT } from "@/types/product";
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import Image from "next/image";
 import Link from "next/link";
-import { FaShoppingCart } from "react-icons/fa";
-import Rate from "./rate";
+import Rate from "./Rate";
 
-
-interface ProductInterface {
-  product: ProductT;
-  currency: string;
-}
-
-const ProductCard = ({
-  product: {
-    id = "",
-    images = [""],
-    name = "",
-    slug = "",
-    rating = 0,
-    price = 0,
-    originalPrice = 0,
-    inCart = false,
-  },
-  currency = "",
-}: ProductInterface) => {
-  if (id.length === 0) return <></>;
+const ProductCard = ({ product }: { product: ProductT }) => {
+  const { _id, image, slug, price, rating, name } = product;
 
   return (
     <Flex className="group max-w-55 flex-col gap-0 overflow-hidden rounded-sm border-none py-1.5 shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]">
       <Link
-        href={`/shop/${slug ?? name}/${id}`}
+        href={`/shop/${slug ?? name}/${_id}`}
         className="transition-all duration-200 group-hover:scale-110"
       >
         <Image
-          src={images[0]}
+          src={image.url}
           alt={name}
           width={200}
           height={172}
-          className="w-full rounded-sm py-1.5"
+          className="aspect-video w-full rounded-sm object-cover py-1.5"
         />
       </Link>
       <Flex className="flex-col gap-3 px-3 py-1.5 text-sm font-bold">
-        <Heading as="h3" className="line-clamp-2 text-[14px]!">
+        <Heading as="h3" className="line-clamp-1 text-[14px]!">
           {name}
         </Heading>
         {rating && <Rate rate={rating} />}
         <Flex className="items-center justify-between!">
           <Text className="text-focused-price">
-            <bdi>{currency}</bdi>
+            <bdi>$</bdi>
             {price}
           </Text>
-          {originalPrice && (
-            <Text className="text-muted-price">
-              <bdi>{currency}</bdi>
-              {originalPrice}
-            </Text>
-          )}
         </Flex>
-        {inCart ? (
-          <Flex className="bg-primary items-center justify-center! rounded-md px-4 py-2 text-white">
-            <FaShoppingCart size={"20px"} />
-          </Flex>
-        ) : (
-          <Button
-            variant="outline"
-            className="border-primary text-primary hover:text-primary text-sm font-bold"
-          >
-            Add to Cart
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          className="border-primary text-primary hover:text-primary text-sm font-bold"
+        >
+          Add to Cart
+        </Button>
       </Flex>
     </Flex>
   );

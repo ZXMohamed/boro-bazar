@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuthStore } from "@/store/authStore";
 import { ApiErrorResponse, ApiResponse } from "@/types/api";
 import axios, {
@@ -15,6 +16,7 @@ export class ApiError extends Error {
   constructor(
     public statusCode: number,
     public message: string,
+    public code?: string,
     public errors?: Record<string, string[]>,
     public originalError?: AxiosError,
   ) {
@@ -26,8 +28,7 @@ export class ApiError extends Error {
 /**
  * Axios Configuration
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const axiosConfig: AxiosRequestConfig = {
   baseURL: API_BASE_URL,
@@ -35,7 +36,7 @@ const axiosConfig: AxiosRequestConfig = {
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Send cookies with requests
+  withCredentials: true, // Send cookies with every request (cookie-based auth)
 };
 
 /**
@@ -45,19 +46,11 @@ const apiClient: AxiosInstance = axios.create(axiosConfig);
 
 /**
  * Request Interceptor
- * - Add authorization token
  * - Add custom headers
  * - Log requests in development
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Get token from auth store
-    const token = useAuthStore.getState().token;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     // Add request ID for tracking
     config.headers["X-Request-ID"] = generateRequestId();
 
@@ -84,7 +77,7 @@ apiClient.interceptors.request.use(
  * Response Interceptor
  * - Handle success responses
  * - Handle various error scenarios
- * - Refresh token on 401
+ * - Refresh token on 401 (via cookie-based refresh endpoint)
  * - Logout on 401 (permanent)
  * - Retry failed requests
  */
@@ -100,7 +93,11 @@ apiClient.interceptors.response.use(
 
     return response;
   },
-  async (error: AxiosError<ApiErrorResponse>) => {
+  async (
+    error: AxiosError<
+      ApiErrorResponse | { success: boolean; message: string; code?: string }
+    >,
+  ) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -113,6 +110,7 @@ apiClient.interceptors.response.use(
         new ApiError(
           0,
           "Network error. Please check your connection.",
+          undefined,
           undefined,
           error,
         ),
@@ -131,38 +129,31 @@ apiClient.interceptors.response.use(
 
     /**
      * Handle 401 Unauthorized
+     * Attempt a silent token refresh via the cookie-based refresh endpoint.
+     * The backend sets the new auth cookie in the response automatically.
      */
     if (status === 401) {
       const authStore = useAuthStore.getState();
 
-      // Check if token refresh is needed
       if (!originalRequest._retry) {
         originalRequest._retry = true;
 
         try {
-          // Attempt to refresh token
-          const refreshResponse = await axios.post(
+          // Cookie is sent automatically via withCredentials; backend rotates
+          // the auth cookie and responds with 200 on success.
+          await axios.post(
             `${API_BASE_URL}/auth/refresh-token`,
             {},
             {
+              withCredentials: true,
               headers: {
                 "X-Request-ID": generateRequestId(),
               },
             },
           );
 
-          const newToken = refreshResponse.data?.data?.token;
-
-          if (newToken) {
-            // Update token in store
-            authStore.setToken(newToken);
-
-            // Update authorization header
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-            // Retry original request
-            return apiClient(originalRequest);
-          }
+          // Retry the original request — the refreshed cookie will be sent
+          return apiClient(originalRequest);
         } catch (refreshError) {
           console.error("[Token Refresh Failed]", refreshError);
         }
@@ -180,6 +171,7 @@ apiClient.interceptors.response.use(
         new ApiError(
           401,
           "Session expired. Please login again.",
+          "UNAUTHORIZED",
           undefined,
           error,
         ),
@@ -190,12 +182,14 @@ apiClient.interceptors.response.use(
      * Handle 403 Forbidden
      */
     if (status === 403) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           403,
-          data?.message ||
+          errorData?.message ||
             "You do not have permission to access this resource.",
-          data?.errors,
+          errorData?.code,
+          errorData?.errors,
           error,
         ),
       );
@@ -205,10 +199,12 @@ apiClient.interceptors.response.use(
      * Handle 404 Not Found
      */
     if (status === 404) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           404,
-          data?.message || "Resource not found.",
+          errorData?.message || "Resource not found.",
+          errorData?.code,
           undefined,
           error,
         ),
@@ -219,11 +215,13 @@ apiClient.interceptors.response.use(
      * Handle 409 Conflict
      */
     if (status === 409) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           409,
-          data?.message || "Resource conflict. Please try again.",
-          data?.errors,
+          errorData?.message || "Resource conflict. Please try again.",
+          errorData?.code,
+          errorData?.errors,
           error,
         ),
       );
@@ -233,11 +231,13 @@ apiClient.interceptors.response.use(
      * Handle 422 Unprocessable Entity (Validation Errors)
      */
     if (status === 422) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           422,
-          data?.message || "Validation failed.",
-          data?.errors,
+          errorData?.message || "Validation failed.",
+          errorData?.code,
+          errorData?.errors,
           error,
         ),
       );
@@ -251,6 +251,7 @@ apiClient.interceptors.response.use(
         new ApiError(
           429,
           "Too many requests. Please try again later.",
+          "RATE_LIMITED",
           undefined,
           error,
         ),
@@ -261,10 +262,12 @@ apiClient.interceptors.response.use(
      * Handle 500+ Server Errors
      */
     if (status >= 500) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           status,
-          data?.message || "Server error. Please try again later.",
+          errorData?.message || "Server error. Please try again later.",
+          errorData?.code,
           undefined,
           error,
         ),
@@ -275,11 +278,13 @@ apiClient.interceptors.response.use(
      * Handle 4xx Client Errors
      */
     if (status >= 400) {
+      const errorData = data as any;
       return Promise.reject(
         new ApiError(
           status,
-          data?.message || "An error occurred. Please try again.",
-          data?.errors,
+          errorData?.message || "An error occurred. Please try again.",
+          errorData?.code,
+          errorData?.errors,
           error,
         ),
       );
@@ -287,7 +292,13 @@ apiClient.interceptors.response.use(
 
     // Fallback error
     return Promise.reject(
-      new ApiError(status, "An unexpected error occurred.", undefined, error),
+      new ApiError(
+        status,
+        "An unexpected error occurred.",
+        "UNKNOWN_ERROR",
+        undefined,
+        error,
+      ),
     );
   },
 );
@@ -323,6 +334,16 @@ export function getErrorMessage(error: unknown): string {
   }
 
   return "An unexpected error occurred.";
+}
+
+/**
+ * Get error code
+ */
+export function getErrorCode(error: unknown): string | undefined {
+  if (isApiError(error)) {
+    return error.code;
+  }
+  return undefined;
 }
 
 /**

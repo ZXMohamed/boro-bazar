@@ -1,17 +1,18 @@
 export interface ApiResponse<T = unknown> {
   success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-  timestamp?: string;
-  statusCode?: number;
+  results: number;
+  data: T;
+  count?: number;
+  totalPages?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface ApiErrorResponse {
   success: false;
-  error: string;
-  message?: string;
-  statusCode: number;
+  message: string;
+  code?: string;
   errors?: Record<string, string[]>;
+  statusCode?: number;
   timestamp?: string;
 }
