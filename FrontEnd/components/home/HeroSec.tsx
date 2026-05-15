@@ -49,7 +49,7 @@ const HeroSec = () => {
         </div>
 
         {/* Image Area */}
-        <div className="hidden h-full overflow-hidden md:block">
+        <div className="hidden h-full overflow-hidden rounded-2xl md:block">
           <Image
             src="/heroImg.png"
             alt="Wella Organics Super Omega Squares"

@@ -4,7 +4,8 @@ import { devtools, persist } from "zustand/middleware";
 
 /**
  * Auth Store
- * Handles user authentication state and tokens
+ * Handles user authentication state
+ * Token management is handled server-side via HTTP-only cookies
  * Persists to localStorage with selective storage
  */
 export const useAuthStore = create<AuthState>()(
@@ -13,8 +14,6 @@ export const useAuthStore = create<AuthState>()(
       (set, get) => ({
         // Initial State
         user: null,
-        token: null,
-        refreshToken: null,
         isLoading: false,
         error: null,
         isAuthenticated: false,
@@ -22,11 +21,6 @@ export const useAuthStore = create<AuthState>()(
         // Actions
         setUser: (user) =>
           set({ user, isAuthenticated: !!user }, false, "setUser"),
-
-        setToken: (token) => set({ token }, false, "setToken"),
-
-        setRefreshToken: (refreshToken) =>
-          set({ refreshToken }, false, "setRefreshToken"),
 
         setLoading: (isLoading) => set({ isLoading }, false, "setLoading"),
 
@@ -36,12 +30,10 @@ export const useAuthStore = create<AuthState>()(
          * Set complete auth state at once
          * Used after successful login/register
          */
-        setAuth: (user, token, refreshToken) =>
+        setAuth: (user) =>
           set(
             {
               user,
-              token,
-              refreshToken: refreshToken || null,
               isAuthenticated: true,
               error: null,
             },
@@ -56,8 +48,6 @@ export const useAuthStore = create<AuthState>()(
           set(
             {
               user: null,
-              token: null,
-              refreshToken: null,
               isAuthenticated: false,
               error: null,
             },
@@ -88,8 +78,6 @@ export const useAuthStore = create<AuthState>()(
         partialize: (state) => ({
           // Only persist these fields
           user: state.user,
-          token: state.token,
-          refreshToken: state.refreshToken,
           isAuthenticated: state.isAuthenticated,
         }),
         // Optional: Custom storage implementation
@@ -108,7 +96,6 @@ export const useAuthStore = create<AuthState>()(
  * Use these to subscribe to specific parts of state
  */
 export const selectUser = (state: AuthState) => state.user;
-export const selectToken = (state: AuthState) => state.token;
 export const selectIsAuthenticated = (state: AuthState) =>
   state.isAuthenticated;
 export const selectIsLoading = (state: AuthState) => state.isLoading;
